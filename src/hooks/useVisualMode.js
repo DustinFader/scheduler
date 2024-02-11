@@ -11,8 +11,10 @@ const useVisualMode = (initial) => {
 
   const back = () => {
     setMode(history[1]);
-    const [prev, ...rest] = history;
-    setHistory(prev => rest);
+    setHistory(prev => {
+      const [first, ...rest] = prev;
+      return rest;
+    });
   }
   
   return {mode, transition, back};
