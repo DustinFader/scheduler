@@ -14,11 +14,14 @@ import { waitForElement } from "@testing-library/react";
 
 import {
   getByText,
+  getByTestId,
   getAllByTestId,
   getByAltText,
   queryByAltText,
   queryByText,
 } from "@testing-library/react";
+
+import axios from "axios";
 
 afterEach(cleanup);
 
@@ -123,5 +126,51 @@ describe("Application", () => {
 
     // 8. Check that the DayListItem with the text "Monday" has 1 spots remaining, same as prior the save".
     expect(getByText(day, "1 spot remaining")).toBeInTheDocument();
+  });
+
+  it("shows the save error when failing to save the appointment", async () => {
+    const { container } = render(<Application />);
+
+    await waitForElement(() => getByText(container, "Archie Cohen"));
+
+    const appointments = getAllByTestId(container, "appointment");
+    const appointment = appointments[0];
+
+    fireEvent.click(getByAltText(appointment, "Add"));
+
+    fireEvent.change(getByPlaceholderText(appointment, /enter student name/i), {
+      target: { value: "Lydia Miller-Jones" },
+    });
+
+    fireEvent.click(getByAltText(appointment, "Sylvia Palmer"));
+    axios.put.mockRejectedValueOnce();
+    fireEvent.click(getByText(appointment, "Save"));
+
+    await waitForElement(() => getByTestId(appointment, "Error"));
+
+    expect(getByText(appointment, "Error")).toBeInTheDocument();
+  });
+
+  it("shows the delete error when failing to delete an existing appointment", async () => {
+    const { container, debug } = render(<Application />);
+
+    await waitForElement(() => getByText(container, "Archie Cohen"));
+
+    const appointment = getAllByTestId(container, "appointment").find(
+      (appointment) => queryByText(appointment, "Archie Cohen")
+    );
+
+    fireEvent.click(queryByAltText(appointment, "Delete"));
+
+    expect(
+      getByText(appointment, "Are you sure you would like to delete?")
+    ).toBeInTheDocument();
+
+    axios.delete.mockRejectedValueOnce();
+    fireEvent.click(getByText(appointment, "Confirm"));
+
+    await waitForElement(() => getByTestId(appointment, "Error"));
+
+    expect(getByText(appointment, "Error")).toBeInTheDocument();
   });
 });
