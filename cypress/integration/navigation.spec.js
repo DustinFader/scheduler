@@ -5,7 +5,6 @@ describe('Navigation', () => {
 
   it('should navigate to tuesday', () => {
     cy.visit('/');
-    cy.contains('li', 'Tuesday').as('Tuesday').click();
-    cy.get('@Tuesday').should('have.css', 'background-color', 'rgb(242, 242, 242)');
+    cy.contains('[data-testid=day]', 'Tuesday').click().should('have.class', 'day-list__item--selected');
   });
 });
