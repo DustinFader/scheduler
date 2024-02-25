@@ -83,7 +83,7 @@ describe("Application", () => {
     fireEvent.click(getByText(appointment, "Confirm"));
 
     // 6. Check that the element with the text "Deleting" is displayed.
-    expect(getByText(appointment, "DELETING")).toBeInTheDocument();
+    expect(getByText(appointment, "Deleting")).toBeInTheDocument();
 
     // 7. wait until the element with the "Add" button is displayed in its place.
     await waitForElement(() => queryByAltText(appointment, "Add"));
